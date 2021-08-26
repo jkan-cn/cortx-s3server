@@ -82,15 +82,9 @@ s3_bundle_location=$bundle_path/s3
 
 haproxy_config="/etc/haproxy/haproxy.cfg"
 # Collecting rotated logs for haproxy and ldap along with live log
-haproxy_status_log="/var/log/cortx/haproxy-status.log"
-haproxy_log="/var/log/cortx/haproxy.log"
-ldap_log="/var/log/cortx/slapd.log"
-
 haproxy_log="$base_log_file_path/haproxy.log"
 haproxy_status_log="$base_log_file_path/haproxy-status.log"
-
-haproxy_sysconfig=$(s3confstore "yaml:///opt/seagate/cortx/s3/mini-prov/s3_prov_config.yaml" getkey --key="S3_HAPROXY_SYSCONF_SYMLINK")
-haproxy_sysconfig_log_file=$(s3confstore "properties://$haproxy_sysconfig" getkey --key="LOG_FILE")
+haproxy_log_k8s=$(s3confstore "yaml:///opt/seagate/cortx/s3/mini-prov/s3_prov_config.yaml" getkey --key="S3_HAPROXY_LOG_SYMLINK")
 
 s3server_config="$base_config_file_path/s3/conf/s3config.yaml"
 authserver_config="$base_config_file_path/auth/resources/authserver.properties"
@@ -230,11 +224,12 @@ collect_m0trace_files(){
   echo "Collecting m0trace files dump..."
   m0trace_filename_pattern="m0trace.*"
 
-  tmpr_dir="$tmp_dir/m0traces_tmp"
+  dir="$base_log_file_path/motr"
+  tmpr_dir="$tmp_dir/m0trraces_tmp"
   cwd=$(pwd)
   # if $base_log_file_path/motr missing then return
 
-  if [ ! -d "$s3_motr_dir" ];
+  if [ ! -d "$dir" ];
   then
       return;
   fi
@@ -280,7 +275,6 @@ collect_m0trace_files(){
 collect_first_m0trace_file(){
   echo "Collecting oldest m0trace file dump..."
   dir="$base_log_file_path/motr"
-
   cwd=$(pwd)
   m0trace_filename_pattern="*/m0trace.*"
   if [ ! -d "$s3_motr_dir" ];
@@ -401,6 +395,18 @@ then
     args+=($s3cluster_config)
 fi
 
+# Collect s3cluster config file if available
+if [ -f "$s3cluster_config" ];
+then
+    args=$args" "$s3cluster_config
+fi
+
+# Collect s3cluster config file if available
+if [ -f "$s3cluster_config" ];
+then
+    args=$args" "$s3cluster_config
+fi
+
 # Collect s3startsystem script file if available
 if [ -f "$s3startsystem_script" ];
 then
@@ -432,15 +438,9 @@ then
 fi
 
 # Collect haproxy k8s log along with rotated logs if available
-if [ -f "$haproxy_sysconfig_log_file" ];
+if [ -f "$haproxy_log_k8s" ];
 then
-    args+=($haproxy_sysconfig_log_file*)
-fi
-
-# Collect haproxy status log
-if [ -f "$haproxy_status_log" ];
-then
-    args=$args" "$haproxy_status_log*
+    args+=($haproxy_log_k8s*)
 fi
 
 # Create temporary directory for creating other files as below
