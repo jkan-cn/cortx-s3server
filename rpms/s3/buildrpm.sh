@@ -76,8 +76,6 @@ echo "Using [S3_VERSION=${S3_VERSION}] ..."
 ! [ -z "${PATH_SRC}" ] && echo "Using [PATH_SRC=${PATH_SRC}] ..."
 echo "Install after build ${INSTALL_AFTER_BUILD}"
 
-set -xe
-
 mkdir -p ~/rpmbuild/SOURCES/
 cd ~/rpmbuild/SOURCES/
 rm -rf cortx-s3server*
@@ -107,14 +105,17 @@ elif ! [ -z "${PATH_SRC}" ]; then
 fi
 
 # check all required pre-requsites rpms are present or not
+echo "Checking Pre-requisites rpms are present or not"
 cd ~/rpmbuild/SOURCES/cortx-s3server-${S3_VERSION}-git${GIT_VER}
 while IFS= read -r package;
 do
   if ! rpm -qa | grep $package; then
-   echo "RPM [$package] is not present"
+   echo "RPM [$package] is not present."
    exit
   fi
 done < "scripts/env/common/third-party-rpms.txt"
+
+set -xe
 
 cd ~/rpmbuild/SOURCES/
 tar -zcvf cortx-s3server-${S3_VERSION}-git${GIT_VER}.tar.gz cortx-s3server-${S3_VERSION}-git${GIT_VER}
