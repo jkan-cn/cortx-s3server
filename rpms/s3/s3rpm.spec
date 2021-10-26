@@ -121,7 +121,7 @@ S3 server provides S3 REST API interface support for Motr object storage.
 
 # check all required pre-requsites rpms are present or not
 echo "Checking Pre-requisites rpms are present or not"
-for third_party_rpm in %{_third_party_rpms}
+for third_party_rpm in ${%{_third_party_rpms}[@]}
 do
   echo "Third party RPM: $third_party_rpm"
   if ! rpm -qa | grep $third_party_rpm; then
