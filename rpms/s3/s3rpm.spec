@@ -118,6 +118,17 @@ S3 server provides S3 REST API interface support for Motr object storage.
 # pre install/upgrade section
 ################################
 %pre
+
+# check all required pre-requsites rpms are present or not
+echo "Checking Pre-requisites rpms are present or not"
+while IFS= read -r package;
+do
+  if ! rpm -qa | grep $package; then
+   echo "RPM [$package] is not present."
+   exit
+  fi
+done < "/opt/seagate/cortx/s3/bin/third-party-rpms.txt"
+
 if [ $1 == 1 ];then
     echo "[cortx-s3server-rpm] INFO: S3 RPM Pre Install section started"
     echo "[cortx-s3server-rpm] INFO: S3 RPM Pre Install section completed"
@@ -398,6 +409,7 @@ echo "[cortx-s3server-rpm] INFO: S3 RPM Clean section completed"
 /opt/seagate/cortx/s3/bin/ldapaccountaction.py
 /opt/seagate/cortx/s3/bin/merge.py
 /opt/seagate/cortx/s3/bin/s3_haproxy_config.py
+/opt/seagate/cortx/s3/bin/third-party-rpms.txt
 %attr(755, root, root) /opt/seagate/cortx/s3/bin/s3_setup
 %attr(755, root, root) /opt/seagate/cortx/s3/bin/s3_start
 %attr(755, root, root) /opt/seagate/cortx/s3/s3backgrounddelete/s3backgroundconsumer

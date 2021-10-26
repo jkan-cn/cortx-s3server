@@ -104,17 +104,6 @@ elif ! [ -z "${PATH_SRC}" ]; then
     find ./cortx-s3server-${S3_VERSION}-git${GIT_VER} -type f -name CMakeCache.txt -delete;
 fi
 
-# check all required pre-requsites rpms are present or not
-echo "Checking Pre-requisites rpms are present or not"
-cd ~/rpmbuild/SOURCES/cortx-s3server-${S3_VERSION}-git${GIT_VER}
-while IFS= read -r package;
-do
-  if ! rpm -qa | grep $package; then
-   echo "RPM [$package] is not present."
-   exit
-  fi
-done < "scripts/env/common/third-party-rpms.txt"
-
 set -xe
 
 cd ~/rpmbuild/SOURCES/
