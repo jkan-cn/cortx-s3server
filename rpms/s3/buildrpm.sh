@@ -108,7 +108,7 @@ fi
 # Get all third party rpms from scripts/env/common/third-party-rpms.txt
 # to send to rpmspec for validation
 third_party_rpms=""
-echo "Checking Pre-requisites rpms are present or not"
+echo "Get all third party rpms from scripts/env/common/third-party-rpms.txt"
 cd ~/rpmbuild/SOURCES/cortx-s3server-${S3_VERSION}-git${GIT_VER}
 while IFS= read -r third_party_rpm;
 do
