@@ -104,6 +104,17 @@ elif ! [ -z "${PATH_SRC}" ]; then
     find ./cortx-s3server-${S3_VERSION}-git${GIT_VER} -type f -name CMakeCache.txt -delete;
 fi
 
+
+# Get all third party rpms from scripts/env/common/third-party-rpms.txt
+# to send to rpmspec for validation
+third_party_rpms=""
+echo "Checking Pre-requisites rpms are present or not"
+cd ~/rpmbuild/SOURCES/cortx-s3server-${S3_VERSION}-git${GIT_VER}
+while IFS= read -r third_party_rpm;
+do
+    third_party_rpms="$third_party_rpms $third_party_rpm"
+done < "scripts/env/common/third-party-rpms.txt"
+echo "Third party RPMS: $third_party_rpms"
 set -xe
 
 cd ~/rpmbuild/SOURCES/
@@ -118,6 +129,7 @@ if [ -z "${DISABLE_MOTR}" ]; then
   rpmbuild -ba \
            --define "_s3_version ${S3_VERSION}" \
            --define "_s3_git_ver git${GIT_VER}" \
+           --define "_third_party_rpms ${third_party_rpms}" \
            ${BASEDIR}/s3rpm.spec --with python3
 
 else
@@ -126,6 +138,7 @@ else
   rpmbuild -ba \
            --define "_s3_version ${S3_VERSION}" \
            --define "_s3_git_ver git${GIT_VER}" \
+           --define "_third_party_rpms ${third_party_rpms}" \
            ${BASEDIR}/s3rpm.spec --with python3 \
            --define "$DISABLE_MOTR"
 fi
